@@ -12,6 +12,8 @@ build/
 __pycache__/
 *.so
 env/
+*.npy
+simulated_data/
 
 #VS Code files and container
 .vscode/
