@@ -538,7 +538,7 @@ class YOLOV8Detector(Task):
 
         gt_labels = y["classes"]
 
-        mask_gt = tf.reduce_all(y["boxes"] > -1.0, axis=-1, keepdims=True)
+        mask_gt = tf.reduce_all(y["boxes"] > -1, axis=-1, keepdims=True)
         gt_bboxes = bounding_box.convert_format(
             y["boxes"],
             source=self.bounding_box_format,
