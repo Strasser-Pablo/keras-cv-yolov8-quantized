@@ -14,6 +14,7 @@ __pycache__/
 env/
 *.npy
 simulated_data/
+*.h5
 
 #VS Code files and container
 .vscode/

@@ -41,6 +41,7 @@ def normalization_method(val, method, min=0, max=0, mean=0, std=0):
 
 matrices_training = []
 matrices_validation = []
+matrices_test = []
 
 ########################################################################
 # Transform data
@@ -125,21 +126,22 @@ for folder_element, calocell_file in enumerate(dir_files):
         matrix *= 255
         matrix = matrix.astype(np.uint8)
 
-        if i%10 == 0:
-            matrices_validation.append(matrix)
+        if i%5 == 0:
+            if i%10 == 0:
+                matrices_validation.append(matrix)
+            else:
+                matrices_test.append(matrix)
         else:
             matrices_training.append(matrix)
 
-        # im = Image.fromarray(matrix, 'RGB')
-        # im_flipped = im.transpose(method=Image.Transpose.FLIP_TOP_BOTTOM)
+        im = Image.fromarray(matrix, 'RGB')
 
-        # plt.imshow(im_flipped)
-        # plt.show()
-
-        # im_flipped.save("testImages/" + "test_" + str(i) + ".png", compress_level=0)
+        plt.imshow(im)
+        plt.show()
     
-    if folder_element+1 >= 1:
+    if folder_element+1 >= 2:
         break
 
 np.save("matrices_training.npy", np.array(matrices_training))
 np.save("matrices_validation.npy", np.array(matrices_validation))
+np.save("matrices_test.npy", np.array(matrices_test))

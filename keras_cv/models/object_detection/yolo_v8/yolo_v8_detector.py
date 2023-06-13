@@ -44,7 +44,7 @@ from keras_cv.models.task import Task
 from keras_cv.utils.python_utils import classproperty
 from keras_cv.utils.train import get_feature_extractor
 
-BOX_REGRESSION_CHANNELS = 64
+BOX_REGRESSION_CHANNELS = 16
 
 
 def get_anchors(
