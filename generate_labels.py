@@ -71,6 +71,7 @@ for folder_element, jet_file in enumerate(dir_files_jet):
 
         tmp_labels = []
         tmp_classes = []
+        # print(len(df_jet['eta_rounded']))
 
         for j in range(len(df_jet['eta_rounded'])):
             label = [55, 32, 10, 10]
@@ -109,8 +110,8 @@ for folder_element, jet_file in enumerate(dir_files_jet):
             labels_training.append(tmp_labels)
             classes_training.append(tmp_classes)
 
-    if folder_element+1 >= 2:
-        break
+    # if folder_element+1 >= 4:
+    #     break
 
 np.save("labels_training.npy", np.array(labels_training))
 np.save("labels_validation.npy", np.array(labels_validation))

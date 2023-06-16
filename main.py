@@ -5,7 +5,7 @@ import numpy as np
 import os
 
 NAME_BACKBONE = "yolo_v8_xs_backbone"
-TRAIN = False
+TRAIN = True
 
 images = np.load("matrices_training.npy")
 
