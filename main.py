@@ -4,7 +4,7 @@ import keras_cv
 import numpy as np
 import os
 
-NAME_BACKBONE = "yolo_v8_s_backbone"
+NAME_BACKBONE = "yolo_v8_m_backbone"
 TRAIN = True
 
 images = np.load("matrices_training.npy")
@@ -51,11 +51,11 @@ else:
         optimizer=tf.optimizers.SGD(global_clipnorm=10.0),
         jit_compile=False,
     )
-    model.fit(images, labels, validation_data=(images_validation, labels_validation), epochs=300)
+    model.fit(images, labels, validation_data=(images_validation, labels_validation), epochs=30)
 
     model.save_weights(NAME_BACKBONE+".h5", overwrite="True", save_format="h5", options=None)
 
 # Get predictions using the model
-print(model.predict(images_test[:1]))
-print("Boxes : ", labels_test["boxes"][:1])
-print("Classes : ", labels_test["classes"][:1])
+# print(model.predict(images_test[:1]))
+# print("Boxes : ", labels_test["boxes"][:1])
+# print("Classes : ", labels_test["classes"][:1])

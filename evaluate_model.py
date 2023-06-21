@@ -6,7 +6,7 @@ import os
 import sys
 import copy
 
-NAME_BACKBONE = "yolo_v8_xs_backbone"
+NAME_BACKBONE = "yolo_v8_m_backbone"
 CONFIDENCE = 0.5
 IOU_THRESHOLD = 0.5
 
