@@ -74,6 +74,9 @@ true_positif = 0
 false_positif = 0
 false_negative = 0
 
+ap_array_labels = []
+ap_array_scores = []
+
 for i in range(len(results["boxes"].to_tensor())):
     detection_over_confidence = 0
     true_detection = 0
@@ -99,6 +102,7 @@ for i in range(len(results["boxes"].to_tensor())):
             if best_iou >= IOU_THRESHOLD:
                 boxes_gt.pop(index_iou)
                 true_detection += 1
+                
                 # print(best_iou)
 
     true_positif += true_detection

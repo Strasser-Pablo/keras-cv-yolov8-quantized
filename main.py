@@ -3,8 +3,9 @@ from tensorflow import keras
 import keras_cv
 import numpy as np
 import os
+import hls4ml
 
-NAME_BACKBONE = "yolo_v8_s_backbone"
+NAME_BACKBONE = "yolo_v8_xs_backbone"
 TRAIN = True
 
 images = np.load("matrices_training.npy")
@@ -51,11 +52,19 @@ else:
         optimizer=tf.optimizers.SGD(global_clipnorm=10.0),
         jit_compile=False,
     )
-    model.fit(images, labels, validation_data=(images_validation, labels_validation), epochs=50)
+    model.fit(images, labels, validation_data=(images_validation, labels_validation), epochs=5, batch_size=32)
 
     model.save_weights(NAME_BACKBONE+".h5", overwrite="True", save_format="h5", options=None)
 
+
+model.summary()
 # Get predictions using the model
 # print(model.predict(images_test[:1]))
 # print("Boxes : ", labels_test["boxes"][:1])
 # print("Classes : ", labels_test["classes"][:1])
+
+# tf.keras.saving.save_model(model, "model.tf")
+
+print(model.get_layer())
+
+config = hls4ml.converters.keras_to_hls(model.get_config())
