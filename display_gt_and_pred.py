@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 
 NAME_BACKBONE = "yolo_v8_xs_backbone"
-CONFIDENCE = 0.3
+CONFIDENCE = 0.7
 
 images_test = np.load("matrices_test.npy")
 
