@@ -24,20 +24,20 @@ from keras_cv import bounding_box
 from keras_cv.models.object_detection.__test_utils__ import (
     _create_bounding_box_dataset,
 )
-from keras_cv.models.object_detection.yolo_v8.yolo_v8_detector_presets import (
+from keras_cv.models.object_detection.yolo_v8_quantized.yolo_v8_detector_presets import (
     yolo_v8_detector_presets,
 )
 
 
-class YOLOV8DetectorTest(tf.test.TestCase, parameterized.TestCase):
+class YOLOV8DetectorTestQuantized(tf.test.TestCase, parameterized.TestCase):
     @pytest.mark.large  # Fit is slow, so mark these large.
     def test_fit(self):
         bounding_box_format = "xywh"
-        yolo = keras_cv.models.YOLOV8Detector(
+        yolo = keras_cv.models.YOLOV8DetectorQuantized(
             num_classes=2,
             fpn_depth=1,
             bounding_box_format=bounding_box_format,
-            backbone=keras_cv.models.YOLOV8Backbone.from_preset(
+            backbone=keras_cv.models.YOLOV8BackboneQuantized.from_preset(
                 "yolo_v8_xs_backbone"
             ),
         )
@@ -54,11 +54,11 @@ class YOLOV8DetectorTest(tf.test.TestCase, parameterized.TestCase):
     @pytest.mark.large  # Fit is slow, so mark these large.
     def test_throws_with_ragged_tensors(self):
         bounding_box_format = "xywh"
-        yolo = keras_cv.models.YOLOV8Detector(
+        yolo = keras_cv.models.YOLOV8DetectorQuantized(
             num_classes=2,
             fpn_depth=1,
             bounding_box_format=bounding_box_format,
-            backbone=keras_cv.models.YOLOV8Backbone.from_preset(
+            backbone=keras_cv.models.YOLOV8BackboneQuantized.from_preset(
                 "yolo_v8_xs_backbone"
             ),
         )
@@ -75,11 +75,11 @@ class YOLOV8DetectorTest(tf.test.TestCase, parameterized.TestCase):
             yolo.fit(x=xs, y=ys, epochs=1)
 
     def test_trainable_weight_count(self):
-        yolo = keras_cv.models.YOLOV8Detector(
+        yolo = keras_cv.models.YOLOV8DetectorQuantized(
             num_classes=2,
             fpn_depth=1,
             bounding_box_format="xywh",
-            backbone=keras_cv.models.YOLOV8Backbone.from_preset(
+            backbone=keras_cv.models.YOLOV8BackboneQuantized.from_preset(
                 "yolo_v8_s_backbone"
             ),
         )
@@ -87,11 +87,11 @@ class YOLOV8DetectorTest(tf.test.TestCase, parameterized.TestCase):
         self.assertEqual(len(yolo.trainable_weights), 195)
 
     def test_bad_loss(self):
-        yolo = keras_cv.models.YOLOV8Detector(
+        yolo = keras_cv.models.YOLOV8DetectorQuantized(
             num_classes=2,
             fpn_depth=1,
             bounding_box_format="xywh",
-            backbone=keras_cv.models.YOLOV8Backbone.from_preset(
+            backbone=keras_cv.models.YOLOV8BackboneQuantized.from_preset(
                 "yolo_v8_xs_backbone"
             ),
         )
@@ -116,11 +116,11 @@ class YOLOV8DetectorTest(tf.test.TestCase, parameterized.TestCase):
     )
     @pytest.mark.large  # Saving is slow, so mark these large.
     def test_saved_model(self, save_format, filename):
-        model = keras_cv.models.YOLOV8Detector(
+        model = keras_cv.models.YOLOV8DetectorQuantized(
             num_classes=20,
             bounding_box_format="xywh",
             fpn_depth=1,
-            backbone=keras_cv.models.YOLOV8Backbone.from_preset(
+            backbone=keras_cv.models.YOLOV8BackboneQuantized.from_preset(
                 "yolo_v8_xs_backbone"
             ),
         )
@@ -131,18 +131,18 @@ class YOLOV8DetectorTest(tf.test.TestCase, parameterized.TestCase):
         restored_model = keras.models.load_model(save_path)
 
         # Check we got the real object back.
-        self.assertIsInstance(restored_model, keras_cv.models.YOLOV8Detector)
+        self.assertIsInstance(restored_model, keras_cv.models.YOLOV8DetectorQuantized)
 
         # Check that output matches.
         restored_output = restored_model(xs)
         self.assertAllClose(model_output, restored_output)
 
     def test_update_prediction_decoder(self):
-        yolo = keras_cv.models.YOLOV8Detector(
+        yolo = keras_cv.models.YOLOV8DetectorQuantized(
             num_classes=2,
             fpn_depth=1,
             bounding_box_format="xywh",
-            backbone=keras_cv.models.YOLOV8Backbone.from_preset(
+            backbone=keras_cv.models.YOLOV8BackboneQuantized.from_preset(
                 "yolo_v8_s_backbone"
             ),
             prediction_decoder=keras_cv.layers.MultiClassNonMaxSuppression(
@@ -172,10 +172,10 @@ class YOLOV8DetectorTest(tf.test.TestCase, parameterized.TestCase):
 
 
 @pytest.mark.large
-class YOLOV8DetectorSmokeTest(tf.test.TestCase):
+class YOLOV8DetectorSmokeTestQuantized(tf.test.TestCase):
     # TODO(ianstenbit): Update this test to use a KerasCV-trained preset.
     def test_preset_with_forward_pass(self):
-        model = keras_cv.models.YOLOV8Detector.from_preset(
+        model = keras_cv.models.YOLOV8DetectorQuantized.from_preset(
             "yolo_v8_m_pascalvoc",
             bounding_box_format="xywh",
         )
@@ -200,10 +200,10 @@ class YOLOV8DetectorSmokeTest(tf.test.TestCase):
 
 
 @pytest.mark.extra_large
-class YOLOV8DetectorPresetFullTest(tf.test.TestCase):
+class YOLOV8DetectorPresetFullTestQuantized(tf.test.TestCase):
     """
     Test the full enumeration of our presets.
-    This every presets for YOLOV8Detector and is only run manually.
+    This every presets for YOLOV8DetectorQuantized and is only run manually.
     Run with:
     `pytest keras_cv/models/object_detection/yolo_v8/yolo_v8_detector_test.py --run_extra_large`
     """  # noqa: E501
@@ -211,7 +211,7 @@ class YOLOV8DetectorPresetFullTest(tf.test.TestCase):
     def test_load_yolo_v8_detector(self):
         input_data = tf.ones(shape=(2, 224, 224, 3))
         for preset in yolo_v8_detector_presets:
-            model = keras_cv.models.YOLOV8Detector.from_preset(
+            model = keras_cv.models.YOLOV8DetectorQuantized.from_preset(
                 preset, bounding_box_format="xywh"
             )
             model(input_data)

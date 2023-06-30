@@ -100,13 +100,13 @@ class YOLOV8BackboneQuantized(Backbone):
     input_data = tf.ones(shape=(8, 224, 224, 3))
 
     # Pretrained backbone
-    model = keras_cv.models.YOLOV8Backbone.from_preset(
+    model = keras_cv.models.YOLOV8BackboneQuantized.from_preset(
         "yolo_v8_xs_backbone_coco"
     )
     output = model(input_data)
 
     # Randomly initialized backbone with a custom config
-    model = keras_cv.models.YOLOV8Backbone(
+    model = keras_cv.models.YOLOV8BackboneQuantized(
         stackwise_channels=[128, 256, 512, 1024],
         stackwise_depth=[3, 9, 9, 3],
         include_rescaling=False,

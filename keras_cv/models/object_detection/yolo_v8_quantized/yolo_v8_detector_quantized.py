@@ -325,7 +325,7 @@ class YOLOV8DetectorQuantized(Task):
     Args:
         backbone: `keras.Model`, must implement the `pyramid_level_inputs`
             property with keys "P2", "P3", and "P4" and layer names as values.
-            A sensible backbone to use is the `keras_cv.models.YOLOV8Backbone`.
+            A sensible backbone to use is the `keras_cv.models.YOLOV8BackboneQuantized`.
         num_classes: integer, the number of classes in your dataset excluding the
             background class. Classes should be represented by integers in the
             range [0, num_classes).
@@ -337,7 +337,7 @@ class YOLOV8DetectorQuantized(Task):
             the Feature Pyramid Network. This is usually 1, 2, or 3, depending
             on the size of your YOLOV8Detector model. We recommend using 3 for
             "yolo_v8_l_backbone" and "yolo_v8_xl_backbone". Defaults to 2.
-        label_encoder: (Optional)  A `YOLOV8LabelEncoder` that is
+        label_encoder: (Optional)  A `YOLOV8LabelEncoderQuantized` that is
             responsible for transforming input boxes into trainable labels for
             YOLOV8Detector. If not provided, a default is provided.
         prediction_decoder: (Optional)  A `keras.layers.Layer` that is
