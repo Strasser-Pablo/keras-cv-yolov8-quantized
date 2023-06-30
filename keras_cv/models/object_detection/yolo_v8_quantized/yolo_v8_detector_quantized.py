@@ -475,7 +475,7 @@ class YOLOV8DetectorQuantized(Task):
 
         if isinstance(box_loss, str):
             if box_loss == "iou":
-                box_loss = YOLOV8IoULoss(reduction="sum")
+                box_loss = YOLOV8IoULossQuantized(reduction="sum")
             else:
                 raise ValueError(
                     f"Invalid box loss for YOLOV8Detector: {box_loss}. Box "
