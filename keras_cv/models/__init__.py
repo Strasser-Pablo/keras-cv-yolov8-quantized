@@ -105,6 +105,12 @@ from keras_cv.models.object_detection.yolo_v8.yolo_v8_backbone import (
 from keras_cv.models.object_detection.yolo_v8.yolo_v8_detector import (
     YOLOV8Detector,
 )
+from keras_cv.models.object_detection.yolo_v8_quantized.yolo_v8_backbone_quantized import (
+    YOLOV8BackboneQuantized,
+)
+from keras_cv.models.object_detection.yolo_v8_quantized.yolo_v8_detector_quantized import (
+    YOLOV8DetectorQuantized,
+)
 from keras_cv.models.object_detection_3d.center_pillar import (
     MultiHeadCenterPillar,
 )

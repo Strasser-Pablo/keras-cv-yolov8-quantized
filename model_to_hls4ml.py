@@ -9,17 +9,17 @@ NAME_BACKBONE = "yolo_v8_xs_backbone"
 
 images_test = np.load("matrices_test.npy")
 
-model = load_model('model.tf', compile=False)
+# model = load_model('model.tf', compile=False)
 # print(model.get_layer("model_1").get_config())
 
-# model = keras_cv.models.YOLOV8Detector(
-#     num_classes=2,
-#     bounding_box_format="center_xywh",
-#     backbone=keras_cv.models.YOLOV8Backbone.from_preset(
-#         NAME_BACKBONE
-#     ),
-#     fpn_depth=2
-# )
+model = keras_cv.models.YOLOV8DetectorQuantized(
+    num_classes=2,
+    bounding_box_format="center_xywh",
+    backbone=keras_cv.models.YOLOV8BackboneQuantized.from_preset(
+        NAME_BACKBONE
+    ),
+    fpn_depth=2
+)
 
 # keras.utils.plot_model(model, "my_first_model.png")
 
