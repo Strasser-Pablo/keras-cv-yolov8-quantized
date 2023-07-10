@@ -25,7 +25,7 @@ backbone_presets_no_weights = {
         "class_name": "keras_cv.models>YOLOV8Backbone",
         "config": {
             "include_rescaling": True,
-            "input_shape": (None, None, 3),
+            "input_shape": (64, 64, 3),
             "stackwise_channels": [32, 64, 128, 256],
             "stackwise_depth": [1, 2, 2, 1],
             "activation": "swish",

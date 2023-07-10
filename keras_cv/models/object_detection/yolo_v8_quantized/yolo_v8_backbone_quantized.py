@@ -58,7 +58,9 @@ def apply_spatial_pyramid_pooling_fast(
         pool_size=pool_size, strides=1, padding="same", name=f"{name}_pool3"
     )(pool_2)
 
-    out = tf.concat([x, pool_1, pool_2, pool_3], axis=channel_axis)
+    out = layers.Concatenate(axis=channel_axis)([x, pool_1])
+    out = layers.Concatenate(axis=channel_axis)([out, pool_2])
+    out = layers.Concatenate(axis=channel_axis)([out, pool_3])
     out = apply_conv_bn(
         out,
         input_channels,
@@ -121,15 +123,15 @@ class YOLOV8BackboneQuantized(Backbone):
         stackwise_depth,
         include_rescaling,
         activation="swish",
-        input_shape=(None, None, 3),
+        input_shape=(64, 64, 3),
         input_tensor=None,
         **kwargs,
     ):
         inputs = utils.parse_model_inputs(input_shape, input_tensor)
 
         x = inputs
-        if include_rescaling:
-            x = layers.Rescaling(1 / 255.0)(x)
+        # if include_rescaling:
+        #     x = layers.Rescaling(1 / 255.0)(x)
 
         """ Stem """
         stem_width = stackwise_channels[0]

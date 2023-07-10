@@ -72,9 +72,11 @@ def apply_csp_block(
         activation=activation,
         name=f"{name}_pre",
     )
-    short, deep = tf.split(pre, 2, axis=channel_axis)
+    # short, deep = tf.split(pre, 2, axis=channel_axis)
 
-    out = [short, deep]
+    # out = [short, deep]
+
+    deep = pre
     for id in range(depth):
         deep = apply_conv_bn(
             deep,
@@ -90,11 +92,11 @@ def apply_csp_block(
             activation=activation,
             name=f"{name}_pre_{id}_2",
         )
-        deep = (out[-1] + deep) if shortcut else deep
-        out.append(deep)
-    out = tf.concat(out, axis=channel_axis)
+        # deep = (out[-1] + deep) if shortcut else deep
+        # out.append(deep)
+    # out = tf.concat(out, axis=channel_axis)
     out = apply_conv_bn(
-        out,
+        deep,
         channels,
         kernel_size=1,
         activation=activation,

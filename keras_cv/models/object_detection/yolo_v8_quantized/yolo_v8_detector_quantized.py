@@ -628,14 +628,22 @@ class YOLOV8DetectorQuantized(Task):
         self.make_test_function(force=True)
 
     def get_config(self):
-        return {
-            "num_classes": self.num_classes,
-            "bounding_box_format": self.bounding_box_format,
-            "fpn_depth": self.fpn_depth,
-            "backbone": keras.utils.serialize_keras_object(self.backbone),
-            "label_encoder": self.label_encoder,
-            "prediction_decoder": self._prediction_decoder,
-        }
+        config = super().get_config()
+        config.update(
+            {
+                "layers": keras.utils.serialize_keras_object(self.layers),
+                "num_classes": self.num_classes,
+                "bounding_box_format": self.bounding_box_format,
+                "fpn_depth": self.fpn_depth,
+                "backbone": keras.utils.serialize_keras_object(self.backbone),
+                "label_encoder": self.label_encoder,
+                "prediction_decoder": self._prediction_decoder,
+            }
+        )
+        # config["config"]
+        #             "layers": keras.utils.serialize_keras_object(self.layers),
+        #         }
+        return config
 
     @classproperty
     def presets(cls):
