@@ -52,10 +52,10 @@ labels_test = {
     "classes": np.load("classes_test.npy")
 }
 
-model = keras_cv.models.YOLOV8Detector(
+model = keras_cv.models.YOLOV8DetectorQuantized(
     num_classes=2,
     bounding_box_format="center_xywh",
-    backbone=keras_cv.models.YOLOV8Backbone.from_preset(
+    backbone=keras_cv.models.YOLOV8BackboneQuantized.from_preset(
         NAME_BACKBONE
     ),
     fpn_depth=2

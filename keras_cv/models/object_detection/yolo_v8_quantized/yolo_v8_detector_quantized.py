@@ -14,6 +14,7 @@
 import copy
 
 import tensorflow as tf
+import keras
 from keras import layers
 from tensorflow import keras
 
@@ -121,8 +122,9 @@ def apply_path_aggregation_fpn(features, depth=3, name="fpn"):
     p3, p4, p5 = features
 
     # Upsample P5 and concatenate with P4, then apply a CSPBlock.
-    p5_upsampled = tf.image.resize(p5, tf.shape(p4)[1:-1], method="nearest")
-    p4p5 = tf.concat([p5_upsampled, p4], axis=-1)
+    p5_upsampled = keras.layers.UpSampling2D()(p5)
+    # p5_upsampled = tf.image.resize(p5, tf.shape(p4)[1:-1], method="nearest")
+    p4p5 = keras.layers.concatenate([p5_upsampled, p4], axis=3)
     p4p5 = apply_csp_block(
         p4p5,
         channels=p4.shape[-1],
@@ -133,8 +135,9 @@ def apply_path_aggregation_fpn(features, depth=3, name="fpn"):
     )
 
     # Upsample P4P5 and concatenate with P3, then apply a CSPBlock.
-    p4p5_upsampled = tf.image.resize(p4p5, tf.shape(p3)[1:-1], method="nearest")
-    p3p4p5 = tf.concat([p4p5_upsampled, p3], axis=-1)
+    p4p5_upsampled = keras.layers.UpSampling2D()(p4p5)
+    # p4p5_upsampled = tf.image.resize(p4p5, tf.shape(p3)[1:-1], method="nearest")
+    p3p4p5 = keras.layers.concatenate([p4p5_upsampled, p3], axis=3)
     p3p4p5 = apply_csp_block(
         p3p4p5,
         channels=p3.shape[-1],
@@ -153,7 +156,7 @@ def apply_path_aggregation_fpn(features, depth=3, name="fpn"):
         activation="swish",
         name=f"{name}_p3p4p5_downsample1",
     )
-    p3p4p5_d1 = tf.concat([p3p4p5_d1, p4p5], axis=-1)
+    p3p4p5_d1 = keras.layers.concatenate([p3p4p5_d1, p4p5], axis=3)
     p3p4p5_d1 = apply_csp_block(
         p3p4p5_d1,
         channels=p4p5.shape[-1],
@@ -172,7 +175,7 @@ def apply_path_aggregation_fpn(features, depth=3, name="fpn"):
         activation="swish",
         name=f"{name}_p3p4p5_downsample2",
     )
-    p3p4p5_d2 = tf.concat([p3p4p5_d2, p5], axis=-1)
+    p3p4p5_d2 = keras.layers.concatenate([p3p4p5_d2, p5], axis=3)
     p3p4p5_d2 = apply_csp_block(
         p3p4p5_d2,
         channels=p5.shape[-1],
@@ -266,20 +269,28 @@ def apply_yolo_v8_head(
             "sigmoid", name=f"{cur_name}_classifier"
         )(class_predictions)
 
-        out = tf.concat([box_predictions, class_predictions], axis=-1)
+        out = layers.concatenate([box_predictions, class_predictions], axis=3)
         out = layers.Reshape(
             [-1, out.shape[-1]], name=f"{cur_name}_output_reshape"
         )(out)
         outputs.append(out)
 
-    outputs = tf.concat(outputs, axis=1)
+    print("HEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEERE")
+    print(len(outputs))
+    tmp_outputs = layers.concatenate([outputs[0], outputs[1]], axis=1)
+    outputs = layers.concatenate([tmp_outputs, outputs[2]], axis=1)
     outputs = layers.Activation("linear", dtype="float32", name="box_outputs")(
         outputs
     )
 
+    # return {
+    #     "boxes": outputs[:, :, :BOX_REGRESSION_CHANNELS],
+    #     "classes": outputs[:, :, BOX_REGRESSION_CHANNELS:],
+    # }
+
     return {
-        "boxes": outputs[:, :, :BOX_REGRESSION_CHANNELS],
-        "classes": outputs[:, :, BOX_REGRESSION_CHANNELS:],
+        "boxes": outputs,
+        "classes": outputs,
     }
 
 
@@ -417,30 +428,28 @@ class YOLOV8DetectorQuantized(Task):
         )
 
         # To make loss metrics pretty, we use a no-op layer with a good name.
-        boxes = keras.layers.Concatenate(axis=1, name="box")([outputs["boxes"]])
-        scores = keras.layers.Concatenate(axis=1, name="class")(
-            [outputs["classes"]]
-        )
+        # boxes = keras.layers.concatenate([outputs["boxes"]], axis=1, name="box")
+        # scores = keras.layers.concatenate([outputs["classes"]], axis=1, name="class")
 
-        outputs = {"boxes": boxes, "classes": scores}
+        # outputs = {"boxes": boxes, "classes": scores}
         super().__init__(inputs=images, outputs=outputs, **kwargs)
 
         self.bounding_box_format = bounding_box_format
         self._prediction_decoder = (
             prediction_decoder
-            or keras_cv.layers.MultiClassNonMaxSuppression(
-                bounding_box_format=bounding_box_format,
-                from_logits=False,
-                confidence_threshold=0.2,
-                iou_threshold=0.7,
-            )
+            # or keras_cv.layers.MultiClassNonMaxSuppression(
+            #     bounding_box_format=bounding_box_format,
+            #     from_logits=False,
+            #     confidence_threshold=0.2,
+            #     iou_threshold=0.7,
+            # )
         )
         self.backbone = backbone
         self.fpn_depth = fpn_depth
         self.num_classes = num_classes
-        self.label_encoder = label_encoder or YOLOV8LabelEncoderQuantized(
-            num_classes=num_classes
-        )
+        self.label_encoder = label_encoder #or YOLOV8LabelEncoderQuantized(
+        #     num_classes=num_classes
+        # )
 
     def compile(
         self,
@@ -628,10 +637,24 @@ class YOLOV8DetectorQuantized(Task):
         self.make_test_function(force=True)
 
     def get_config(self):
+        layers_flat = []
+        for layer in self.layers:
+            try:
+                layers_flat.extend(layer.layers)
+            except AttributeError:
+                layers_flat.append(layer)
+        # model_flat = keras.models.Sequential(layers_flat)
+        # config = model_flat.get_config()
+
         config = super().get_config()
+        print("--------------------------------------------------------------")
+        print(self.output)
+        print("--------------------------------------------------------------")
         config.update(
             {
-                "layers": keras.utils.serialize_keras_object(self.layers),
+                "input_layers": self.input.name,
+                "output_layers": ["boxes", "labels"],
+                "layers": keras.utils.serialize_keras_object(layers_flat),
                 "num_classes": self.num_classes,
                 "bounding_box_format": self.bounding_box_format,
                 "fpn_depth": self.fpn_depth,

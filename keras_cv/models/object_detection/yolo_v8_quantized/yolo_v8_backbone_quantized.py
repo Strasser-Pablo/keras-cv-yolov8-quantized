@@ -37,7 +37,7 @@ from keras_cv.utils.python_utils import classproperty
 def apply_spatial_pyramid_pooling_fast(
     inputs, pool_size=5, activation="swish", name="spp_fast"
 ):
-    channel_axis = -1
+    channel_axis = 3
     input_channels = inputs.shape[channel_axis]
     hidden_channels = int(input_channels // 2)
 
@@ -48,19 +48,19 @@ def apply_spatial_pyramid_pooling_fast(
         activation=activation,
         name=f"{name}_pre",
     )
-    pool_1 = layers.MaxPool2D(
+    pool_1 = layers.MaxPooling2D(
         pool_size=pool_size, strides=1, padding="same", name=f"{name}_pool1"
     )(x)
-    pool_2 = layers.MaxPool2D(
+    pool_2 = layers.MaxPooling2D(
         pool_size=pool_size, strides=1, padding="same", name=f"{name}_pool2"
     )(pool_1)
-    pool_3 = layers.MaxPool2D(
+    pool_3 = layers.MaxPooling2D(
         pool_size=pool_size, strides=1, padding="same", name=f"{name}_pool3"
     )(pool_2)
 
-    out = layers.Concatenate(axis=channel_axis)([x, pool_1])
-    out = layers.Concatenate(axis=channel_axis)([out, pool_2])
-    out = layers.Concatenate(axis=channel_axis)([out, pool_3])
+    out = layers.concatenate([x, pool_1], axis=channel_axis)
+    out = layers.concatenate([out, pool_2], axis=channel_axis)
+    out = layers.concatenate([out, pool_3], axis=channel_axis)
     out = apply_conv_bn(
         out,
         input_channels,
