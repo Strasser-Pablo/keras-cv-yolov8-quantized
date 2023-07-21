@@ -1,9 +1,10 @@
 import hls4ml
-import keras_cv
-import tensorflow as tf
-import numpy as np
-from tensorflow.keras.models import load_model
 import keras
+import numpy as np
+import tensorflow as tf
+from tensorflow.keras.models import load_model
+
+import keras_cv
 
 NAME_BACKBONE = "yolo_v8_xs_backbone"
 
@@ -11,7 +12,7 @@ images_test = np.load("matrices_test.npy")
 
 labels_test = {
     "boxes": np.load("labels_test.npy"),
-    "classes": np.load("classes_test.npy")
+    "classes": np.load("classes_test.npy"),
 }
 
 # model = load_model('model.tf', compile=False)
@@ -20,10 +21,8 @@ labels_test = {
 model = keras_cv.models.YOLOV8DetectorQuantized(
     num_classes=2,
     bounding_box_format="center_xywh",
-    backbone=keras_cv.models.YOLOV8BackboneQuantized.from_preset(
-        NAME_BACKBONE
-    ),
-    fpn_depth=2
+    backbone=keras_cv.models.YOLOV8BackboneQuantized.from_preset(NAME_BACKBONE),
+    fpn_depth=2,
 )
 
 model.summary()
@@ -44,7 +43,13 @@ print("END")
 # This will download our example model to your working directory and return an example configuration file
 # print(model.get_config())
 # print(model.get_layer("model"))
-config = hls4ml.utils.config_from_keras_model(model)
+
+print("model")
+print(model)
+
+import tf2onnx
+
+tf2onnx.convert.from_keras(model, output_path="model.onnx")
 
 
 print("-----------------------------------")
@@ -52,10 +57,15 @@ print("Configuration")
 print(config)
 print("-----------------------------------")
 hls_model = hls4ml.converters.convert_from_keras_model(
-    model, hls_config=config, output_dir='model_1/hls4ml_prj', part='xcu250-figd2104-2L-e'
+    model,
+    hls_config=config,
+    output_dir="model_1/hls4ml_prj",
+    part="xcu250-figd2104-2L-e",
 )
 
-hls4ml.utils.plot_model(hls_model, show_shapes=True, show_precision=True, to_file=None)
+hls4ml.utils.plot_model(
+    hls_model, show_shapes=True, show_precision=True, to_file=None
+)
 
 hls_model.compile()
 
